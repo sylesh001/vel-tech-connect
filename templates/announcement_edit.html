@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Edit announcement{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">ADMINISTRATION</span><h1>Edit announcement</h1><p class="muted">Changes will be saved while keeping the current publication status.</p></div>
+  <a class="button secondary small" href="{{ url_for('admin_dashboard') }}#announcements">← Back to dashboard</a>
+</section>
+<section class="form-card announcement-edit-card">
+  <form method="post" class="stack-form">
+    <label>Title<input name="title" maxlength="120" required value="{{ announcement.title }}"></label>
+    <label>Message<textarea name="message" rows="8" maxlength="5000" required>{{ announcement.message }}</textarea></label>
+    <label>Priority<select name="priority" required>{% for priority in ['Normal', 'Important', 'Urgent'] %}<option value="{{ priority }}" {% if announcement.priority == priority %}selected{% endif %}>{{ priority }}</option>{% endfor %}</select></label>
+    <p class="announcement-date">Status: {{ 'Published' if announcement.published else 'Unpublished' }}{% if announcement.published_at %} · Published {{ announcement.published_at[:16].replace('T', ' ') }}{% endif %}</p>
+    <div class="announcement-actions"><button class="button primary" type="submit">Save changes</button><a class="button secondary" href="{{ url_for('admin_dashboard') }}#announcements">Cancel</a></div>
+  </form>
+</section>
+{% endblock %}

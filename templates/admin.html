@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard{% endblock %}
+{% block content %}
+<section class="page-heading"><div><span class="eyebrow">ADMINISTRATION</span><h1>Admin dashboard</h1><p class="muted">A clear view of student support activity and campus updates.</p></div><span class="user-chip"><span class="admin-dot" aria-hidden="true">◆</span> Administrator</span></section>
+<nav class="admin-shortcuts" aria-label="Admin dashboard sections"><a href="#analytics">Analytics</a><a href="#recent-complaints">Recent complaints</a><a href="#complaint-management">Manage complaints</a><a href="#faqs">Enquiry FAQs</a><a href="#announcements">Announcements</a></nav>
+<section id="analytics" class="stats-grid" aria-label="Complaint totals"><div class="stat-card"><span>Total complaints</span><strong>{{ counts.total }}</strong><small>All submissions</small></div><div class="stat-card"><span>Pending</span><strong>{{ counts.pending }}</strong><small>Awaiting review</small></div><div class="stat-card"><span>In progress</span><strong>{{ counts.progress }}</strong><small>Being handled</small></div><div class="stat-card"><span>Resolved</span><strong>{{ counts.resolved }}</strong><small>Marked complete</small></div></section>
+<section class="analytics-grid" aria-label="Complaint analytics">
+  <article class="analytics-card">
+    <div class="analytics-heading"><div><h2>Complaints by status</h2><p class="muted">Current workload across all complaints.</p></div></div>
+    <div class="chart-wrap"><canvas id="status-chart" role="img" aria-label="Bar chart showing complaints grouped by status"></canvas></div>
+  </article>
+  <article class="analytics-card">
+    <div class="analytics-heading"><div><h2>Complaints by category</h2><p class="muted">Submissions grouped by complaint category.</p></div></div>
+    <div class="chart-wrap"><canvas id="category-chart" role="img" aria-label="Bar chart showing complaints grouped by category"></canvas></div>
+  </article>
+</section>
+<section id="recent-complaints" class="section-heading"><div><h2>Recent complaints</h2><p class="muted">The latest 10 submissions from the live database.</p></div></section>
+{% if recent_complaints %}
+<div class="table-wrap"><table class="recent-complaints-table"><thead><tr><th>Reference</th><th>Subject</th><th>Status</th><th>Submitted</th></tr></thead><tbody>{% for c in recent_complaints %}<tr><td><code>{{ c.complaint_code }}</code></td><td>{{ c.subject }}</td><td><span class="status {{ c.status|lower|replace(' ', '-') }}">{{ c.status }}</span></td><td>{{ c.created_at[:16].replace('T', ' ') }}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}
+<div class="empty-state analytics-empty"><div class="empty-icon">▤</div><h3>No complaint data yet</h3><p>Charts and recent submissions will appear here when students submit complaints.</p></div>
+{% endif %}
+<section id="complaint-management" class="section-heading"><div><span class="eyebrow">STUDENT SUPPORT</span><h2>Manage complaints</h2><p class="muted">Review submissions, update progress, and send a response.</p></div></section>
+{% if complaints %}<div class="admin-complaints">{% for c in complaints %}<article class="admin-complaint"><div class="complaint-top"><div><span class="eyebrow">{{ c.complaint_code }} · {{ c.category }}</span><h3>{{ c.subject }}</h3><p class="muted">From {{ c.student_name }} · {{ c.student_email }} · {{ c.created_at[:16].replace('T', ' ') }}</p></div><span class="status {{ c.status|lower|replace(' ', '-') }}">{{ c.status }}</span></div><p class="complaint-description">{{ c.description }}</p><form method="post" action="{{ url_for('update_complaint', complaint_id=c.id) }}" class="admin-update"><label>Status<select name="status">{% for s in ['Pending','In Progress','Resolved'] %}<option value="{{ s }}" {% if c.status == s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></label><label class="response-field">Response to student<textarea name="admin_response" rows="2" placeholder="Write an update the student can see">{{ c.admin_response }}</textarea></label><button class="button primary small" type="submit">Save update</button></form></article>{% endfor %}</div>{% else %}<div class="empty-state"><div class="empty-icon">✓</div><h3>No complaints yet</h3><p>Student submissions will appear here.</p></div>{% endif %}
+<section id="faqs" class="faq-admin-section"><div class="section-heading"><div><h2>College enquiry information</h2><p class="muted">Add verified FAQs for the student chatbot.</p></div></div><div class="faq-admin-layout"><form method="post" action="{{ url_for('add_faq') }}" class="form-card stack-form"><h3>Add a college FAQ</h3><label>Topic keyword<input name="topic" required placeholder="e.g. transport"></label><label>Student question<input name="question" required placeholder="e.g. Are college buses available?"></label><label>Answer<textarea name="answer" rows="4" required placeholder="Enter verified information from your college"></textarea></label><button class="button primary" type="submit">Add FAQ →</button></form><div class="faq-list"><h3>Saved FAQ entries</h3>{% for f in faqs %}<article class="faq-item"><span class="eyebrow">{{ f.topic }}</span><strong>{{ f.question }}</strong><p>{{ f.answer }}</p></article>{% endfor %}</div></div></section>
+<section id="announcements" class="announcement-admin-section">
+  <div class="section-heading"><div><h2>Announcements</h2><p class="muted">Create updates for students and control when they are visible.</p></div></div>
+  <div class="announcement-admin-layout">
+    <form method="post" action="{{ url_for('create_announcement') }}" class="form-card stack-form announcement-form">
+      <h3>Create an announcement</h3>
+      <label>Title<input name="title" maxlength="120" required placeholder="e.g. Semester examination schedule"></label>
+      <label>Message<textarea name="message" rows="6" maxlength="5000" required placeholder="Write the full announcement for students"></textarea></label>
+      <label>Priority<select name="priority" required><option>Normal</option><option>Important</option><option>Urgent</option></select></label>
+      <label class="checkbox-label"><input type="checkbox" name="published" value="1"> Publish immediately</label>
+      <button class="button primary" type="submit">Create announcement</button>
+    </form>
+    <div class="announcement-admin-list">
+      <h3>Saved announcements</h3>
+      {% if announcements %}
+        {% for announcement in announcements %}
+        <article class="announcement-admin-card">
+          <div class="announcement-card-heading">
+            <div><h4>{{ announcement.title }}</h4><span class="priority-badge priority-{{ announcement.priority|lower }}">{{ announcement.priority }}</span></div>
+            <span class="announcement-state {{ 'is-published' if announcement.published else 'is-unpublished' }}">{{ 'Published' if announcement.published else 'Unpublished' }}</span>
+          </div>
+          <p class="announcement-message">{{ announcement.message }}</p>
+          <p class="announcement-date">Created {{ announcement.created_at[:16].replace('T', ' ') }}{% if announcement.published_at %} · Published {{ announcement.published_at[:16].replace('T', ' ') }}{% endif %}</p>
+          <div class="announcement-actions">
+            <a class="button secondary small" href="{{ url_for('edit_announcement', announcement_id=announcement.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('set_announcement_publication', announcement_id=announcement.id) }}">
+              <input type="hidden" name="action" value="{{ 'unpublish' if announcement.published else 'publish' }}">
+              <button class="button secondary small" type="submit">{{ 'Unpublish' if announcement.published else 'Publish' }}</button>
+            </form>
+            <form method="post" action="{{ url_for('delete_announcement', announcement_id=announcement.id) }}" onsubmit="return confirm('Delete this announcement? This action cannot be undone.');">
+              <button class="button danger-button small" type="submit">Delete</button>
+            </form>
+          </div>
+        </article>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state"><div class="empty-icon">▤</div><h3>No announcements yet</h3><p>Create an announcement to share updates with students.</p></div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  const statusLabels = {{ status_counts.keys()|list|tojson }};
+  const statusValues = {{ status_counts.values()|list|tojson }};
+  const categoryLabels = {{ category_counts|map(attribute='category')|list|tojson }};
+  const categoryValues = {{ category_counts|map(attribute='count')|list|tojson }};
+  const chartColors = ["#315de8", "#7759d9", "#16835d", "#d38b12", "#d34e57", "#1596a6", "#765c46", "#7b879b"];
+
+  function renderBarChart(elementId, labels, values, colors) {
+    const canvas = document.getElementById(elementId);
+    if (!canvas || !window.Chart) return;
+    new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: labels.map((_, index) => colors[index % colors.length]),
+          borderRadius: 7,
+          maxBarThickness: 38
+        }]
+      },
+      options: {
+        indexAxis: "y",
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: "#edf0f5" } },
+          y: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  renderBarChart("status-chart", statusLabels, statusValues, ["#d38b12", "#315de8", "#16835d"]);
+  renderBarChart("category-chart", categoryLabels, categoryValues, chartColors);
+</script>
+{% endblock %}

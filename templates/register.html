@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Student registration{% endblock %}
+{% block content %}
+<div class="auth-layout"><div class="auth-aside"><span class="eyebrow">WELCOME TO VEL TECH CONNECT</span><h1>Your campus support, in one place.</h1><p>Create a student account to ask college-related questions and manage your complaints.</p><div class="aside-stat"><strong>01</strong><span>Register with your student details</span></div><div class="aside-stat"><strong>02</strong><span>Ask questions or submit a complaint</span></div></div>
+<div class="form-card"><h2>Create student account</h2><p class="muted">Use your email and create a password.</p><form method="post" class="stack-form"><label>Full name<input name="name" required autocomplete="name" placeholder="Your full name"></label><label>Email address<input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label><label>Password<input name="password" type="password" minlength="8" required autocomplete="new-password" placeholder="At least 8 characters"></label><button class="button primary full" type="submit">Create account →</button></form><p class="form-foot">Already registered? <a href="{{ url_for('login') }}">Log in</a></p></div></div>
+{% endblock %}

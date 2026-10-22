@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="auth-layout"><div class="auth-aside"><span class="eyebrow">STUDENT & ADMIN ACCESS</span><h1>Welcome back.</h1><p>Log in to access college enquiry services and complaint management.</p><div class="aside-stat"><strong>✦</strong><span>College information at your fingertips</span></div><div class="aside-stat"><strong>✓</strong><span>Private student complaint tracking</span></div></div>
+<div class="form-card"><h2>Log in</h2><p class="muted">Enter the email and password for your account.</p><form method="post" class="stack-form"><label>Email address<input name="email" type="email" required autocomplete="username" placeholder="you@example.com"></label><label>Password<input name="password" type="password" required autocomplete="current-password" placeholder="Your password"></label><button class="button primary full" type="submit">Log in →</button></form><p class="form-foot">New student? <a href="{{ url_for('register') }}">Create an account</a></p><div class="demo-credentials"><strong>Local demo admin</strong><br>Email: <code>admin@college.local</code><br>Password: <code>Admin@123</code><br><small>Change these credentials before any real deployment.</small></div></div></div>
+{% endblock %}

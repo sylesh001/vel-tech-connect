@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Vel Tech Connect | College Enquiry{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <span class="eyebrow">YOUR STUDENT SUPPORT PORTAL</span>
+    <h1>Campus support,<br><span>made simpler.</span></h1>
+    <p>Find answers to common college questions, keep track of your support requests, and stay up to date with announcements.</p>
+    <div class="hero-actions">
+      {% if session.get('role') == 'student' %}
+      <a class="button primary" href="{{ url_for('chat_page') }}">Ask the chatbot <span aria-hidden="true">→</span></a>
+      <a class="button secondary" href="{{ url_for('new_complaint') }}">Submit a complaint</a>
+      {% elif session.get('role') == 'admin' %}
+      <a class="button primary" href="{{ url_for('admin_dashboard') }}">Open admin dashboard <span aria-hidden="true">→</span></a>
+      {% else %}
+      <a class="button primary" href="{{ url_for('register') }}">Create student account <span aria-hidden="true">→</span></a>
+      <a class="button secondary" href="{{ url_for('login') }}">Log in</a>
+      {% endif %}
+    </div>
+    <div class="trust-line"><span class="dot"></span> Enquiries <span aria-hidden="true">·</span> Complaints <span aria-hidden="true">·</span> Announcements</div>
+  </div>
+  <div class="hero-card">
+    <div class="mock-top"><span class="bot-avatar">✦</span><div><strong>Vel Tech Assistant</strong><small>College enquiry support</small></div><span class="pill">READY</span></div>
+    <div class="chat-bubble bot">Hello! 👋 What would you like to know about the college?</div>
+    <div class="chat-bubble user">How can I apply for admission?</div>
+    <div class="chat-bubble bot">I can guide you to the admission procedure and official college information.</div>
+    <div class="mock-input">Ask a college question... <span aria-hidden="true">↑</span></div>
+    <div class="mini-features"><span>Courses</span><span>Admissions</span><span>Campus life</span></div>
+  </div>
+</section>
+<section class="home-section">
+  <div class="section-heading"><div><span class="eyebrow">ONE PORTAL, THREE SERVICES</span><h2>Support for your campus journey</h2><p class="muted">The tools you need, organized in one easy-to-use place.</p></div></div>
+<section class="feature-grid">
+  <article class="feature-card"><div class="feature-icon blue" aria-hidden="true">✦</div><h3>College enquiries</h3><p>Ask about admissions, courses, fees, scholarships and campus facilities.</p>{% if session.get('role') == 'student' %}<a class="feature-link" href="{{ url_for('chat_page') }}">Open chatbot <span aria-hidden="true">→</span></a>{% else %}<a class="feature-link" href="{{ url_for('login') }}">Sign in to ask <span aria-hidden="true">→</span></a>{% endif %}</article>
+  <article class="feature-card"><div class="feature-icon purple" aria-hidden="true">▤</div><h3>Student support</h3><p>Submit a campus issue and keep its reference and progress close at hand.</p>{% if session.get('role') == 'student' %}<a class="feature-link" href="{{ url_for('new_complaint') }}">Submit a complaint <span aria-hidden="true">→</span></a>{% else %}<a class="feature-link" href="{{ url_for('login') }}">Sign in to get support <span aria-hidden="true">→</span></a>{% endif %}</article>
+  <article class="feature-card"><div class="feature-icon green" aria-hidden="true">✓</div><h3>Campus updates</h3><p>Read announcements published by the administration, including important updates.</p>{% if session.get('role') == 'student' %}<a class="feature-link" href="{{ url_for('student_dashboard') }}#announcements">View announcements <span aria-hidden="true">→</span></a>{% else %}<a class="feature-link" href="{{ url_for('login') }}">Sign in to view updates <span aria-hidden="true">→</span></a>{% endif %}</article>
+</section>
+</section>
+<div class="notice home-notice"><strong>Need current details?</strong> College information can change. Please confirm time-sensitive details through official college channels.</div>
+{% endblock %}

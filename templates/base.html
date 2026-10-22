@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Vel Tech Connect{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='portal.css') }}">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="topbar">
+  <a class="brand" href="{{ url_for('index') }}" aria-label="Vel Tech Connect home">
+    <span class="brand-icon" aria-hidden="true">VT</span>
+    <span class="brand-copy"><strong>Vel Tech Connect</strong><small>Student support portal</small></span>
+  </a>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav id="primary-navigation">
+    {% if session.get('user_id') %}
+      {% if session.get('role') == 'admin' %}
+        <a href="{{ url_for('admin_dashboard') }}">Admin dashboard</a>
+        <a href="{{ url_for('admin_dashboard') }}#announcements">Announcements</a>
+      {% else %}
+        <a href="{{ url_for('student_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('student_dashboard') }}#announcements">Announcements</a>
+        <a href="{{ url_for('chat_page') }}">College enquiry</a>
+        <a href="{{ url_for('new_complaint') }}">Complaint box</a>
+      {% endif %}
+      <a class="nav-cta" href="{{ url_for('logout') }}">Log out</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Log in</a>
+      <a class="nav-cta" href="{{ url_for('register') }}">Student register</a>
+    {% endif %}
+  </nav>
+</header>
+<main id="main-content" class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-stack">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer class="footer"><span class="footer-brand">Vel Tech Connect</span><span>College enquiries, student support, and campus updates in one place.</span></footer>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
